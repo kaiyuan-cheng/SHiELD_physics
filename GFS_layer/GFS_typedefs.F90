@@ -1483,7 +1483,7 @@ module GFS_typedefs
     integer,                intent(in) :: idat(8)
     integer,                intent(in) :: jdat(8)
     character(len=32),      intent(in) :: tracer_names(:)
-    character(len=*),       intent(in), pointer :: input_nml_file(:)
+    character(len=256),       intent(in), pointer :: input_nml_file(:)
     !--- local variables
     integer :: n
     integer :: ios

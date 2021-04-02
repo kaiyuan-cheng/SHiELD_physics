@@ -218,7 +218,7 @@ module GFS_driver
       call gfdl_cloud_microphys_init (Model%me, Model%master, Model%nlunit, Model%input_nml_file, &
                                       Init_parm%logunit, Model%fn_nml)
 #ifndef fvGFS_2017
-      call cloud_diagnosis_init (Model%nlunit, Model%input_nml_file, Init_parm%logunit, Model%fn_nml)
+      call cloud_diagnosis_init (Model%nlunit, Init_parm%logunit, Model%fn_nml)
 #endif
     endif
 
