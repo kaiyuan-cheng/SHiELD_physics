@@ -537,8 +537,8 @@
           enddo
 
           smcwtdx        = smcwtdxy(i)
-          rechx          = rechxy(i)
-          deeprechx      = deeprechxy(i)
+          rechx          = 0.
+          deeprechx      = 0.
 !--
 !   the optional details for precip
 !--
@@ -626,10 +626,6 @@
          fastcpx = undefined
          xlaix   = undefined
          xsaix   = undefined
-
-         smcwtdx = 0.0
-         rechx   = 0.0
-         deeprechx       = 0.0
 
          do k = 1,4
          smoiseqx(k)   = smsoil(k)
@@ -743,8 +739,8 @@
 
              taussxy  (i)                = taussx
 
-             rechxy   (i)                = rechx
-             deeprechxy(i)               = deeprechx
+             rechxy   (i)                = rechxy(i) + rechx
+             deeprechxy(i)               = deeprechxy(i) + deeprechx
              smcwtdxy(i)                 = smcwtdx
              smoiseq(i,1:4)              = smoiseqx(1:4)
 
