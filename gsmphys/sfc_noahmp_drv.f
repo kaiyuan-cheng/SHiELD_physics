@@ -171,7 +171,7 @@
      &       flx1, flx2, flx3, ffrozp, lwdn, pc, prcp, ptu, q2,         &
      &       q2sat, solnet, rc, rcs, rct, rcq, rcsoil, rsmin,           &
      &       runoff1, runoff2, runoff3, sfcspd, sfcprs, sfctmp,         &
-     &       sfcems, sheat, shdfac, shdmin1d, shdmax1d, smcwlt,         &
+     &       sheat, shdfac, shdmin1d, shdmax1d, smcwlt,                 &
      &       smcdry, smcref, smcmax, sneqv, snoalb1d, snowh,            &
      &       snomlt, sncovr, soilw, soilm, ssoil, tsea, th2,            &
      &       xlai, zlvl, swdn, tem, psfc,fdown,t2v,tbot, qmelt
@@ -382,7 +382,7 @@
           lwdn   = dlwflx(i)         !..downward lw flux at sfc in w/m2
           swdn   = dswsfc(i)         !..downward sw flux at sfc in w/m2
           solnet = snet(i)           !..net sw rad flx (dn-up) at sfc in w/m2
-          sfcems = sfcemis(i)
+
 
           sfctmp = t1(i)  
           sfcprs = prsl1(i) 
