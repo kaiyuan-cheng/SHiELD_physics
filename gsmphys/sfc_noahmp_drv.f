@@ -34,7 +34,6 @@
 !
 !
       use machine ,   only : kind_phys
-!     use date_def,   only : idate
       use funcphys,   only : fpvs
       use physcons,   only : con_g, con_hvap, con_cp, con_jcal,         &
      &                con_eps, con_epsm1, con_fvirt, con_rd,con_hfus
@@ -42,7 +41,7 @@
       use module_sf_noahmplsm
       use module_sf_noahmp_glacier
       use noahmp_tables, only : isice_table, co2_table, o2_table,       &
-     &                       isurban_table,smcref_table,smcdry_table,   &
+     &                       isurban_table,smcref_table,smcwlt_table,   &
      &                       smcmax_table,co2_table,o2_table,           &
      &                       saim_table,laim_table
 
@@ -77,7 +76,6 @@
       real(kind=kind_phys), save  :: zsoil(4),sldpth(4)
       data zsoil / -0.1, -0.4, -1.0, -2.0 /
       data sldpth /0.1, 0.3, 0.6, 1.0 /
-!     data dzs /0.1, 0.3, 0.6, 1.0 /
 
 !
 !  ---  input:
@@ -233,8 +231,6 @@
           canopy_old(i) = canopy(i)
           tprcp_old(i)  = tprcp(i)
           srflag_old(i) = srflag(i)
-!
-!
           snow_old(i)   = snowxy(i)
           tv_old(i)     = tvxy(i)
           tg_old(i)     = tgxy(i)
@@ -261,7 +257,6 @@
           tauss_old(i)  = taussxy(i)
           smcwtd_old(i) = smcwtdxy(i)
           rech_old(i)   = rechxy(i)
-
           deeprech_old(i) = deeprechxy(i)
 !
           do k = 1, km
