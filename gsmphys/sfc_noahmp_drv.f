@@ -12,7 +12,7 @@
      &       iopt_inf,iopt_rad, iopt_alb, iopt_snf,iopt_tbot,iopt_stc,  &
      &       iopt_gla,                                                  &
      &       xlatin,xcoszin, iyrlen, julian,imon,                       &
-     &       rainn_mp,rainc_mp,snow_mp,graupel_mp,                      &
+     &       rainn_mp,rainc_mp,snow_mp,graupel_mp,ice_mp,               &
 
 !  ---  in/outs:
      &       weasd, snwdph, tskin, tprcp, srflag, smc, stc, slc,        &
@@ -92,7 +92,7 @@
      &       t1, q1, sigmaf, dlwflx, dswsfc, snet, tg3, cm,             &
      &       ch, prsl1, prslki, wind, shdmin, shdmax,                   &
      &       snoalb, zf,                                                &
-     &       rainn_mp,rainc_mp,snow_mp,graupel_mp
+     &       rainn_mp,rainc_mp,snow_mp,graupel_mp,ice_mp
 
       logical, dimension(im), intent(in) :: dry
 
@@ -553,8 +553,8 @@
           pconv = rainc_mp(i)
           pshcv = 0.
           psnow = snow_mp(i)
-          pgrpl = 0.
-          phail = graupel_mp(i)
+          pgrpl = graupel_mp(i)
+          phail = ice_mp(i)
 !
 !-- old
 !
