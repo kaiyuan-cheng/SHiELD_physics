@@ -762,7 +762,7 @@
 !
           smcmax = smcmax_table(stype) 
           smcref = smcref_table(stype)
-          smcwlt = smcdry_table(stype)
+          smcwlt = smcwlt_table(stype)
 !
 ! outs
 !
