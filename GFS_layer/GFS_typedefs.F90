@@ -811,6 +811,7 @@ module GFS_typedefs
                                             !< as Nccn=100 for sea and Nccn=7000 for land
     real(kind=kind_phys) :: evfact_shal     !< rain evaporation efficiency over the ocean
     real(kind=kind_phys) :: evfactl_shal    !< rain evaporation efficiency over the land
+    real(kind=kind_phys) :: evef_shal       !< rain evaporation efficiency for convection
 
     !--- near surface temperature model
     logical              :: nst_anl         !< flag for NSSTM analysis in gcycle/sfcsub
@@ -2537,6 +2538,7 @@ end subroutine overrides_create
                                                              !< as Nccn=100 for sea and Nccn=7000 for land
     real(kind=kind_phys) :: evfact_shal    = 0.3             !< rain evaporation efficiency over the ocean
     real(kind=kind_phys) :: evfactl_shal   = 0.3             !< rain evaporation efficiency over the land
+    real(kind=kind_phys) :: evef_shal      = 0.07            !< rain evaporation efficiency for convection
 
     !--- near surface temperature model
     logical              :: nst_anl        = .false.         !< flag for NSSTM analysis in gcycle/sfcsub
@@ -2673,7 +2675,7 @@ end subroutine overrides_create
                           !--- mass flux shallow convection
                                clam_shal, c0s_shal, c1_shal, cthk_shal, top_shal,           &
                                betaw_shal, dxcrt_shal, pgcon_shal, asolfac_shal,            &
-                               ext_rain_shal, evfact_shal, evfactl_shal,                    &
+                               ext_rain_shal, evfact_shal, evfactl_shal, evef_shal,         &
                           !--- near surface temperature model
                                nst_anl, lsea, nstf_name,                                    &
                                frac_grid, min_lakeice, min_seaice, min_lake_height,         &
@@ -3002,6 +3004,7 @@ end subroutine overrides_create
     Model%asolfac_shal     = asolfac_shal
     Model%evfact_shal      = evfact_shal
     Model%evfactl_shal     = evfactl_shal
+    Model%evef_shal        = evef_shal
 
     !--- near surface temperature model
     Model%nst_anl          = nst_anl
@@ -3733,6 +3736,7 @@ end subroutine overrides_create
       print *, ' asolfac_shal      : ', Model%asolfac_shal
       print *, ' evfact_shal       : ', Model%evfact_shal
       print *, ' evfactl_shal      : ', Model%evfactl_shal
+      print *, ' evef_shal         : ', Model%evef_shal
       print *, ' '
       print *, 'near surface temperature model'
       print *, ' nst_anl           : ', Model%nst_anl

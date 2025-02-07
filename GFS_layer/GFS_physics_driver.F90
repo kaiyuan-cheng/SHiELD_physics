@@ -3042,7 +3042,10 @@ module module_physics_driver
                               Model%cthk_shal, Model%top_shal, Model%betaw_shal,   &
                               Model%dxcrt_shal, Model%pgcon_shal,                  & 
                               Model%asolfac_shal, Model%limit_shal_conv,           &
-                              Model%use_tke_conv, Model%use_shear_conv)
+                              Model%use_tke_conv, Model%use_shear_conv,            &
+                              Model%evef_shal,                                     &
+! prognostic sigma has not been implemented yet
+                              .false., .false., .false., .false.)
 
 
             raincs(:)     = frain * rain1(:)
