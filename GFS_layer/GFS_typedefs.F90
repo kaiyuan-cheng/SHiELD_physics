@@ -683,6 +683,7 @@ module GFS_typedefs
     logical              :: use_tke_conv    !< flag for adjusting entrainment/detrainment rate in conv scheme
     logical              :: use_shear_conv  !< flag for considering shear effect on updraft/downdraft diagnosis in conv scheme
     logical              :: limit_shal_conv !< flag for constraining shal conv based on diagnosed cloud depth/top
+    logical              :: use_tvd_conv    !< flag for using TVD scheme for mass-flux calculations in saSAS
     logical              :: dspheat         !< flag for tke dissipative heating
     logical              :: lheatstrg       !< flag for canopy heat storage parameterization
     real(kind=kind_phys) :: hour_canopy     !< tunable time scale for canopy heat storage parameterization
@@ -811,6 +812,7 @@ module GFS_typedefs
                                             !< as Nccn=100 for sea and Nccn=7000 for land
     real(kind=kind_phys) :: evfact_shal     !< rain evaporation efficiency over the ocean
     real(kind=kind_phys) :: evfactl_shal    !< rain evaporation efficiency over the land
+    real(kind=kind_phys) :: evef_shal       !< rain evaporation efficiency for convection
 
     !--- near surface temperature model
     logical              :: nst_anl         !< flag for NSSTM analysis in gcycle/sfcsub
@@ -2415,6 +2417,7 @@ end subroutine overrides_create
     logical              :: use_tke_conv   = .false.                  !< flag for adjusting entrainment/detrainment rates in conv
     logical              :: use_shear_conv = .false.                  !< flag for considering shear effect for wu/wd in conv
     logical              :: limit_shal_conv= .false.                  !< flag for constraining shal conv based on diagnosed cloud depth/top
+    logical              :: use_tvd_conv   = .false.                  !< flag for using TVD scheme for mass-flux calculations in saSAS
     logical              :: dspheat        = .false.                  !< flag for tke dissipative heating
     logical              :: lheatstrg      = .false.                  !< flag for canopy heat storage parameterization
     real(kind=kind_phys) :: hour_canopy    = 0.0d0                    !< tunable time scale for canopy heat storage parameterization
@@ -2537,6 +2540,7 @@ end subroutine overrides_create
                                                              !< as Nccn=100 for sea and Nccn=7000 for land
     real(kind=kind_phys) :: evfact_shal    = 0.3             !< rain evaporation efficiency over the ocean
     real(kind=kind_phys) :: evfactl_shal   = 0.3             !< rain evaporation efficiency over the land
+    real(kind=kind_phys) :: evef_shal      = 0.07            !< rain evaporation efficiency for convection
 
     !--- near surface temperature model
     logical              :: nst_anl        = .false.         !< flag for NSSTM analysis in gcycle/sfcsub
@@ -2663,7 +2667,7 @@ end subroutine overrides_create
                                dlqf,rbcr,mix_precip,orogwd,myj_pbl,ysupbl,satmedmf,         &
                                cap_k0_land,do_dk_hb19,use_lup_only,use_l1_sfc,              &
                                use_tke_pbl,use_shear_pbl,use_tke_conv,use_shear_conv,       &
-                               limit_shal_conv,cloud_gfdl,gwd_p_crit,                       &
+                               limit_shal_conv,use_tvd_conv,cloud_gfdl,gwd_p_crit,          &
                           !--- Rayleigh friction
                                prslrd0, ral_ts,                                             &
                           !--- mass flux deep convection
@@ -2673,7 +2677,7 @@ end subroutine overrides_create
                           !--- mass flux shallow convection
                                clam_shal, c0s_shal, c1_shal, cthk_shal, top_shal,           &
                                betaw_shal, dxcrt_shal, pgcon_shal, asolfac_shal,            &
-                               ext_rain_shal, evfact_shal, evfactl_shal,                    &
+                               ext_rain_shal, evfact_shal, evfactl_shal, evef_shal,         &
                           !--- near surface temperature model
                                nst_anl, lsea, nstf_name,                                    &
                                frac_grid, min_lakeice, min_seaice, min_lake_height,         &
@@ -2909,6 +2913,7 @@ end subroutine overrides_create
     Model%use_tke_conv     = use_tke_conv
     Model%use_shear_conv   = use_shear_conv
     Model%limit_shal_conv  = limit_shal_conv
+    Model%use_tvd_conv     = use_tvd_conv
     Model%dspheat          = dspheat
     Model%lheatstrg        = lheatstrg
     Model%hour_canopy      = hour_canopy
@@ -3002,6 +3007,7 @@ end subroutine overrides_create
     Model%asolfac_shal     = asolfac_shal
     Model%evfact_shal      = evfact_shal
     Model%evfactl_shal     = evfactl_shal
+    Model%evef_shal        = evef_shal
 
     !--- near surface temperature model
     Model%nst_anl          = nst_anl
@@ -3641,6 +3647,7 @@ end subroutine overrides_create
       print *, ' use_tke_conv      : ', Model%use_tke_conv
       print *, ' use_shear_conv    : ', Model%use_shear_conv
       print *, ' limit_shal_conv   : ', Model%limit_shal_conv
+      print *, ' use_tvd_conv      : ', Model%use_tvd_conv
       print *, ' dspheat           : ', Model%dspheat
       print *, ' lheatstrg         : ', Model%lheatstrg
       print *, ' hour_canopy       : ', Model%hour_canopy
@@ -3733,6 +3740,7 @@ end subroutine overrides_create
       print *, ' asolfac_shal      : ', Model%asolfac_shal
       print *, ' evfact_shal       : ', Model%evfact_shal
       print *, ' evfactl_shal      : ', Model%evfactl_shal
+      print *, ' evef_shal         : ', Model%evef_shal
       print *, ' '
       print *, 'near surface temperature model'
       print *, ' nst_anl           : ', Model%nst_anl
