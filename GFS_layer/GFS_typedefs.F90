@@ -638,6 +638,7 @@ module GFS_typedefs
     integer              :: iopt_tbot !lower boundary of soil temperature (1->zero-flux; 2->noah)
     integer              :: iopt_stc  !snow/soil temperature time scheme (only layer 1)
     integer              :: iopt_gla  !glacier option (1->phase change; 2->simple)
+    logical              :: lopt_lsp  !Land-cover-specific parameterizations
 
     !--- tuning parameters for physical parameterizations
     logical              :: ras             !< flag for ras convection scheme
@@ -2371,6 +2372,7 @@ end subroutine overrides_create
     integer              :: iopt_tbot      =  2  !lower boundary of soil temperature (1->zero-flux; 2->noah)
     integer              :: iopt_stc       =  1  !snow/soil temperature time scheme (only layer 1)
     integer              :: iopt_gla       =  2  !glacier option (1->phase change; 2->simple)
+    logical              :: lopt_lsp       =  .false.  !Land-cover-specific parameterizations
 
     !--- tuning parameters for physical parameterizations
     logical              :: ras            = .false.                  !< flag for ras convection scheme
@@ -2642,7 +2644,7 @@ end subroutine overrides_create
                           !    Noah MP options
                                iopt_dveg,iopt_crs,iopt_btr,iopt_run,iopt_sfc, iopt_frz,     &
                                iopt_inf, iopt_rad,iopt_alb,iopt_snf,iopt_tbot,iopt_stc,     &
-                               iopt_gla,                                                    &
+                               iopt_gla, lopt_lsp,                                          &
                           !--- physical parameterizations
                                ras, trans_trac, old_monin, cnvgwd, mstrat, moist_adj,       &
                                cscnv, cal_pre, do_aw, do_shoc, shocaftcnv, shoc_cld,        &
@@ -2866,6 +2868,7 @@ end subroutine overrides_create
     Model%iopt_tbot        = iopt_tbot
     Model%iopt_stc         = iopt_stc
     Model%iopt_gla         = iopt_gla
+    Model%lopt_lsp         = lopt_lsp
 
 
     !--- tuning parameters for physical parameterizations
@@ -3240,6 +3243,7 @@ end subroutine overrides_create
       if (Model%lsm == Model%lsm_noah) then
         print *,' NOAH Land Surface Model used'
       elseif (Model%lsm == Model%lsm_noahmp) then
+        print *, 'Noah-MP Land Surface Model used'
         if (Model%ivegsrc /= 1) then
           print *,'Vegetation type must be IGBP if Noah MP is used'
           stop
@@ -3247,24 +3251,6 @@ end subroutine overrides_create
           print *,'Soil type must be STATSGO if Noah MP is used'
           stop
         endif
-        print *, 'New Noah MP Land Surface Model will be used'
-        print *, 'The Physics options are'
-
-        print *,'iopt_dveg  =  ', Model%iopt_dveg
-        print *,'iopt_crs   =  ', Model%iopt_crs
-        print *,'iopt_btr   =  ', Model%iopt_btr
-        print *,'iopt_run   =  ', Model%iopt_run
-        print *,'iopt_sfc   =  ', Model%iopt_sfc
-        print *,'iopt_frz   =  ', Model%iopt_frz
-        print *,'iopt_inf   =  ', Model%iopt_inf
-        print *,'iopt_rad   =  ', Model%iopt_rad
-        print *,'iopt_alb   =  ', Model%iopt_alb
-        print *,'iopt_snf   =  ', Model%iopt_snf
-        print *,'iopt_tbot   =  ',Model%iopt_tbot
-        print *,'iopt_stc   =  ', Model%iopt_stc
-        print *,'iopt_gla   =  ', Model%iopt_gla
-
-
 
       elseif (Model%lsm == 0) then
         print *,' OSU no longer supported - job aborted'
@@ -3581,21 +3567,26 @@ end subroutine overrides_create
       print *, ' Ts0               : ', Model%Ts0
 
       if (Model%lsm == Model%lsm_noahmp) then
-      print *, ' Noah MP LSM is used, the options are'
-      print *, ' iopt_dveg         : ', Model%iopt_dveg
-      print *, ' iopt_crs          : ', Model%iopt_crs
-      print *, ' iopt_btr          : ', Model%iopt_btr
-      print *, ' iopt_run          : ', Model%iopt_run
-      print *, ' iopt_sfc          : ', Model%iopt_sfc
-      print *, ' iopt_frz          : ', Model%iopt_frz
-      print *, ' iopt_inf          : ', Model%iopt_inf
-      print *, ' iopt_rad          : ', Model%iopt_rad
-      print *, ' iopt_alb          : ', Model%iopt_alb
-      print *, ' iopt_snf          : ', Model%iopt_snf
-      print *, ' iopt_tbot         : ', Model%iopt_tbot
-      print *, ' iopt_stc          : ', Model%iopt_stc
-      print *, ' iopt_gla          : ', Model%iopt_gla
-
+        if (Model%lopt_lsp) then
+          print *, ' Noah MP LSM is used '
+          print *, ' Parameterizations vary with land cover type.' 
+          print *, ' See the source code and Li et al. (2022) for more information '
+        else
+          print *, ' Noah MP LSM is used, the options are'
+          print *, ' iopt_dveg         : ', Model%iopt_dveg
+          print *, ' iopt_crs          : ', Model%iopt_crs
+          print *, ' iopt_btr          : ', Model%iopt_btr
+          print *, ' iopt_run          : ', Model%iopt_run
+          print *, ' iopt_sfc          : ', Model%iopt_sfc
+          print *, ' iopt_frz          : ', Model%iopt_frz
+          print *, ' iopt_inf          : ', Model%iopt_inf
+          print *, ' iopt_rad          : ', Model%iopt_rad
+          print *, ' iopt_alb          : ', Model%iopt_alb
+          print *, ' iopt_snf          : ', Model%iopt_snf
+          print *, ' iopt_tbot         : ', Model%iopt_tbot
+          print *, ' iopt_stc          : ', Model%iopt_stc
+          print *, ' iopt_gla          : ', Model%iopt_gla
+        endif
       endif
 
       print *, ' '

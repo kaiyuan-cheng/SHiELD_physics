@@ -10,7 +10,7 @@
      &       shdmin, shdmax, snoalb, sfalb, flag_iter, flag_guess,      &
      &       idveg,iopt_crs, iopt_btr, iopt_run, iopt_sfc, iopt_frz,    &
      &       iopt_inf,iopt_rad, iopt_alb, iopt_snf,iopt_tbot,iopt_stc,  &
-     &       iopt_gla,                                                  &
+     &       iopt_gla,lopt_lsp,                                         &
      &       xlatin,xcoszin, iyrlen, julian,imon,                       &
      &       rainn_mp,rainc_mp,snow_mp,graupel_mp,hail_mp,maxevap,      &
 
@@ -96,10 +96,11 @@
 
       real (kind=kind_phys),dimension(im),intent(in) :: xlatin,xcoszin
 
-      integer,  intent(in) ::  idveg, iopt_crs,iopt_btr,iopt_run,       &
+      integer,  intent(inout) ::  idveg, iopt_crs,iopt_btr,iopt_run,       &
      &                         iopt_sfc,iopt_frz,iopt_inf,iopt_rad,     &
      &                         iopt_alb,iopt_snf,iopt_tbot,iopt_stc,    &
      &                         iopt_gla
+      logical,  intent(in)    ::  lopt_lsp
 
       real (kind=kind_phys),  intent(in) :: julian
       integer,  intent(in)               :: iyrlen
@@ -570,6 +571,33 @@
 
        call transfer_mp_parameters(vtype,stype,slope,                   &
      &                             soil_color_category,parameters)
+       
+       if (lopt_lsp) then
+         ! Land-cover-specific combinations of parameters 
+         ! Li et al., 2022 
+         iopt_run = 1
+         iopt_crs = 1
+         idveg = 4   
+         ! S5 configuration
+         if ( vtype == 1 .or. vtype == 3 .or. vtype == 5 .or.           & 
+     &        vtype == 7 .or. vtype == 13 .or. vtype == 14 ) then       & 
+           iopt_run = 1
+           iopt_crs = 1
+           idveg = 4
+         
+         ! S6 configuration
+         elseif ( vtype == 9 .or. vtype == 10 .or. vtype == 12 ) then   & 
+           iopt_run = 3
+           iopt_crs = 2
+           idveg = 4
+         ! S11 configuration
+         elseif ( vtype == 2 .or. vtype == 4 .or. vtype == 6 .or.       & 
+     &            vtype == 8 .or. vtype == 11 .or. vtype == 15 ) then
+           iopt_run = 3
+           iopt_crs = 1
+           idveg = 2
+         endif
+       endif
 
        call noahmp_options(idveg ,iopt_crs,iopt_btr,iopt_run,iopt_sfc,  &
      & iopt_frz,iopt_inf,iopt_rad,iopt_alb,iopt_snf,iopt_tbot,iopt_stc)

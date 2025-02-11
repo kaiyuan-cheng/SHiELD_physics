@@ -1383,7 +1383,8 @@ module module_physics_driver
             Model%iopt_dveg,  Model%iopt_crs,  Model%iopt_btr,         &
             Model%iopt_run,   Model%iopt_sfc,  Model%iopt_frz,         &
             Model%iopt_inf,   Model%iopt_rad,  Model%iopt_alb,         &
-            Model%iopt_snf,   Model%iopt_tbot, Model%iopt_stc, Model%iopt_gla, &
+            Model%iopt_snf,   Model%iopt_tbot, Model%iopt_stc,         &
+            Model%iopt_gla,   Model%lopt_lsp,                          &
             grid%xlat, xcosz, Model%yearlen,   Model%julian, Model%imn,&
             Sfcprop%drainncprv, Sfcprop%draincprv, Sfcprop%dsnowprv,   &
             Sfcprop%dgraupelprv, Sfcprop%diceprv, maxevap,             &
