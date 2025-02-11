@@ -1468,6 +1468,7 @@ module FV3GFS_io_mod
 
       !---  Now we have the snowxy field
       !     snice + snliq + tsno allocation and compute them from what we have
+
                 Sfcprop(nb)%tsnoxy(ix,-2:0)  = 0.0
                 Sfcprop(nb)%snicexy(ix,-2:0) = 0.0
                 Sfcprop(nb)%snliqxy(ix,-2:0) = 0.0
@@ -1475,8 +1476,22 @@ module FV3GFS_io_mod
 
                 isnow = nint(Sfcprop(nb)%snowxy(ix))+1    ! snowxy <=0.0, dzsno >= 0.0
 
+                ! using stc and tgxy to linearly interpolate the snow temp for each layer
+!Calculate the total thickness
+!                total_thickness = sum(dzsno)
+! Calculate the temperature difference
+!                temp_diff=tgxy(ix)-stc(ix,1)
+! Calculate the mid-points and interpolate temperatures for each layer
+!                 accumulated_thickness = 0.0
+!                do is = isnow, 0
+!                  accumulated_thickness = accumulated_thickness + dzsno(is)
+!                  mid_points(is) = accumulated_thickness - dzsno(is) / 2.0
+!                  layer_temp = tgxy(ix) + (mid_points(is) / total_thickness) * temp_diff
+!                  tsnoxy(ix,is) = layer_temp
+!                end do
+
                 do ns = isnow , 0
-                  Sfcprop(nb)%tsnoxy(ix,ns)  = Sfcprop(nb)%tgxy(ix)
+                  Sfcprop(nb)%tsnoxy(ix,ns)  = Sfcprop(nb)%tgxy(ix) + (( sum(dzsno(isnow:ns)) -0.5*dzsno(ns) )/snd)*(Sfcprop(nb)%stc(ix,1)-Sfcprop(nb)%tgxy(ix))
                   Sfcprop(nb)%snliqxy(ix,ns) = 0.0
                   Sfcprop(nb)%snicexy(ix,ns) = 1.00 * dzsno(ns) * Sfcprop(nb)%weasd(ix)/snd
                 enddo

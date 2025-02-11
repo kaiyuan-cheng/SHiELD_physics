@@ -1613,7 +1613,7 @@ contains
 
   real (kind=kind_phys), parameter                   :: mpe    = 1.e-6
   real (kind=kind_phys), parameter                   :: psiwlt = -150.  !metric potential for wilting point (m)
-  real (kind=kind_phys), parameter                   :: z0     = 0.01   ! bare-soil roughness length (m) (i.e., under the canopy)
+  real (kind=kind_phys), parameter                   :: z0     = 0.015   ! bare-soil roughness length (m) (i.e., under the canopy)
 
 ! ---------------------------------------------------------------------------------------------------
 ! initialize fluxes from veg. fraction
