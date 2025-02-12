@@ -711,11 +711,12 @@ contains
 ! compute snow albedo only if cosz >0
 ! to be consistent with the main noahmp code, currently do not include snow aging when sun is not present
 ! this needs more future work
+
+! snow age even when sun is not present
+
+  call snow_age_glacier (dt,tg,sneqvo,sneqv,tauss,fage)
+  
   if (cosz > 0.0) then
-
-     ! snow age
-
-     call snow_age_glacier (dt,tg,sneqvo,sneqv,tauss,fage)
 
      if(opt_alb == 1) then
         call snowalb_bats_glacier (nband,cosz,fage,albsnd,albsni)
