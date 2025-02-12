@@ -10,7 +10,7 @@
      &       shdmin, shdmax, snoalb, sfalb, flag_iter, flag_guess,      &
      &       idveg,iopt_crs, iopt_btr, iopt_run, iopt_sfc, iopt_frz,    &
      &       iopt_inf,iopt_rad, iopt_alb, iopt_snf,iopt_tbot,iopt_stc,  &
-     &       iopt_gla,                                                  &
+     &       iopt_gla,iopt_rsf,                                         &
      &       xlatin,xcoszin, iyrlen, julian,imon,                       &
      &       rainn_mp,rainc_mp,snow_mp,graupel_mp,hail_mp,maxevap,      &
 
@@ -42,8 +42,8 @@
       use module_sf_noahmp_glacier
       use noahmp_tables, only : isice_table, co2_table, o2_table,       &
      &                       isurban_table,smcref_table,smcwlt_table,   &
-     &                       smcmax_table,co2_table,o2_table,           &
-     &                       saim_table,laim_table
+     &                       smcmax_table,saim_table,laim_table,        &  
+     &                       rsurf_snow_table
 
       implicit none
 
@@ -99,7 +99,7 @@
       integer,  intent(in) ::  idveg, iopt_crs,iopt_btr,iopt_run,       &
      &                         iopt_sfc,iopt_frz,iopt_inf,iopt_rad,     &
      &                         iopt_alb,iopt_snf,iopt_tbot,iopt_stc,    &
-     &                         iopt_gla
+     &                         iopt_gla,iopt_rsf
 
       real (kind=kind_phys),  intent(in) :: julian
       integer,  intent(in)               :: iyrlen
@@ -572,7 +572,8 @@
      &                             soil_color_category,parameters)
 
        call noahmp_options(idveg ,iopt_crs,iopt_btr,iopt_run,iopt_sfc,  &
-     & iopt_frz,iopt_inf,iopt_rad,iopt_alb,iopt_snf,iopt_tbot,iopt_stc)
+     & iopt_frz,iopt_inf,iopt_rad,iopt_alb,iopt_snf,iopt_tbot,iopt_stc, &
+     & iopt_rsf)
 
         if ( vtype == isice_table )  then
 
@@ -1014,6 +1015,7 @@
          parameters%z0sno     =  z0sno_table
          parameters%ssi       =    ssi_table
          parameters%swemx     =  swemx_table
+         parameters%rsurf_snow=  rsurf_snow_table
       
 ! ----------------------------------------------------------------------
 !  transfer soil parameters

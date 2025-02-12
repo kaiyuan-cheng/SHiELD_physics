@@ -128,6 +128,11 @@ module module_sf_noahmplsm
 		      !   2 -> full implicit (original noah); temperature top boundary condition
                       !   3 -> same as 1, but fsno for ts calculation (generally improves snow; v3.7)
 
+  integer :: opt_rsf  !< options for surface resistent to evaporation/sublimation
+                      ! **1 -> sakaguchi and zeng, 2009
+		      !   2 -> sellers (1992)
+                      !   3 -> adjusted sellers to decrease rsurf for wet soil
+		      !   4 -> option 1 for non-snow; rsurf = rsurf_snow for snow (set in mptable); ad v3.8
 !------------------------------------------------------------------------------------------!
 ! physical constants:                                                                      !
 !------------------------------------------------------------------------------------------!
@@ -246,6 +251,7 @@ module module_sf_noahmplsm
      real (kind=kind_phys) :: z0sno        !snow surface roughness length (m) (0.002)
      real (kind=kind_phys) :: ssi          !liquid water holding capacity for snowpack (m3/m3)
      real (kind=kind_phys) :: swemx        !new snow mass to fully cover old snow (mm)
+     real (kind=kind_phys) :: rsurf_snow   !< surface resistance for snow(s/m)
 
 !------------------------------------------------------------------------------------------!
 ! from the soilparm.tbl tables, as functions of soil category.
@@ -1759,17 +1765,22 @@ contains
        rsurf = 1.          ! avoid being divided by 0
        rhsur = 1.0
      else
+        if(opt_rsf == 1 .or. opt_rsf == 4) then
+          ! rsurf based on sakaguchi and zeng, 2009
+          ! taking the "residual water content" to be the wilting point, 
+          ! and correcting the exponent on the d term (typo in sz09 ?)
+          l_rsurf = (-zsoil(1)) * ( exp ( (1.0 - min(1.0,sh2o(1)/parameters%smcmax)) ** 5 ) - 1.0 ) / ( 2.71828 - 1.0 ) 
+          d_rsurf = 2.2e-5 * parameters%smcmax * parameters%smcmax * ( 1.0 - parameters%smcwlt / parameters%smcmax ) ** (2.0+3.0/parameters%bexp)
+          rsurf = l_rsurf / d_rsurf
+        elseif(opt_rsf == 2) then
+          rsurf = fsno * 1. + (1.-fsno)* exp(8.25-4.225*bevap) !sellers (1992)
+        elseif(opt_rsf == 3) then
+          rsurf = fsno * 1. + (1.-fsno)* exp(8.25-6.0  *bevap) !adjusted to decrease rsurf for wet soil
+        endif
 
-        ! rsurf based on sakaguchi and zeng, 2009
-        ! taking the "residual water content" to be the wilting point, 
-        ! and correcting the exponent on the d term (typo in sz09 ?)
-        l_rsurf = (-zsoil(1)) * ( exp ( (1.0 - min(1.0,sh2o(1)/parameters%smcmax)) ** 5 ) - 1.0 ) / ( 2.71828 - 1.0 ) 
-        d_rsurf = 2.2e-5 * parameters%smcmax * parameters%smcmax * ( 1.0 - parameters%smcwlt / parameters%smcmax ) ** (2.0+3.0/parameters%bexp)
-        rsurf = l_rsurf / d_rsurf
-
-        ! older rsurf computations:
-        !    rsurf = fsno * 1. + (1.-fsno)* exp(8.25-4.225*bevap) !sellers (1992)
-        !    rsurf = fsno * 1. + (1.-fsno)* exp(8.25-6.0  *bevap) !adjusted to decrease rsurf for wet soil
+       if(opt_rsf == 4) then  ! ad: fsno weighted; snow rsurf set in mptable v3.8
+         rsurf = 1. / (fsno * (1./parameters%rsurf_snow) + (1.-fsno) * (1./max(rsurf, 0.001)))
+       endif
 
        if(sh2o(1) < 0.01 .and. snowh == 0.) rsurf = 1.e6
        psi   = -parameters%psisat*(max(0.01,sh2o(1))/parameters%smcmax)**(-parameters%bexp)   
@@ -8229,7 +8240,8 @@ end  subroutine shallowwatertable
 !== begin noahmp_options ===========================================================================
 
   subroutine noahmp_options(idveg     ,iopt_crs  ,iopt_btr  ,iopt_run  ,iopt_sfc  ,iopt_frz , & 
-                             iopt_inf  ,iopt_rad  ,iopt_alb  ,iopt_snf  ,iopt_tbot, iopt_stc )
+                            iopt_inf  ,iopt_rad  ,iopt_alb  ,iopt_snf  ,iopt_tbot, iopt_stc , &
+                            iopt_rsf )
 
   implicit none
 
@@ -8247,7 +8259,7 @@ end  subroutine shallowwatertable
 
   integer,  intent(in) :: iopt_stc  !snow/soil temperature time scheme (only layer 1)
                                     ! 1 -> semi-implicit; 2 -> full implicit (original noah)
-
+  integer,  intent(in) :: iopt_rsf  !< surface resistance (1->sakaguchi/zeng; 2->seller; 3->mod sellers; 4->1+snow)
 ! -------------------------------------------------------------------------------------------------
 
   dveg = idveg
@@ -8263,7 +8275,8 @@ end  subroutine shallowwatertable
   opt_snf  = iopt_snf  
   opt_tbot = iopt_tbot 
   opt_stc  = iopt_stc
-  
+  opt_rsf  = iopt_rsf
+
   end subroutine noahmp_options
  
 
